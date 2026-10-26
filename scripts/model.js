@@ -55,6 +55,7 @@ export function sameBlock(r1, c1, r2, c2) {
 /** Read the value at (row, col): a digit 1-9, or EMPTY (-1). */
 export function getCell(board, row, col) {
   // TODO: return the value stored at board[row][col]
+  return board[row][col]
 }
 
 /**
@@ -65,6 +66,10 @@ export function getCell(board, row, col) {
  */
 export function setCell(board, row, col, value) {
   // TODO: return a new 9x9 board with exactly one cell changed
+  const newBoard = board.map((row)=>row.map((col)=>col));
+
+  newBoard[row][col] = value;
+  return newBoard;
 }
 
 /**
@@ -77,11 +82,40 @@ export function setCell(board, row, col, value) {
  */
 export function findConflicts(board, row, col) {
   // TODO: return an array of [row, col] pairs that conflict with (row, col)
+  if(getCell(board,row,col) === EMPTY){
+    return [];
+ }
+  const boardLength = board.length;
+  const conflicts = [];
+
+  for(let i=0; i<boardLength; i++){
+    for(let j=0;j<boardLength; j++){
+      if((sameColumn(row,col,i,j) || sameRow(row,col,i,j) || sameBlock(row,col,i,j))&&!(sameRow(row,col,i,j) && sameColumn(row,col,i,j))){
+        if(getCell(board,row,col) === getCell(board,i,j)){
+          conflicts.push([i,j]);
+        }
+      }
+    }
+  }
+  return conflicts;
 }
 
 /** True when every cell is filled (no EMPTY) and nothing conflicts. */
 export function isComplete(board) {
   // TODO: false if any cell is EMPTY or has conflicts; otherwise true
+  for(let i=0; i<boardLength; i++){
+    for(let j=0;j<boardLength; j++){
+
+      if(getCell(board,i,j)===EMPTY){
+        return false;
+      }
+
+      if(findConflicts(board,i,j).length!==0){
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 // ---------------------------------------------------------------------
@@ -93,15 +127,26 @@ export function isComplete(board) {
 export function formatDuration(durationSeconds) {
   // TODO: whole minutes, then zero-padded seconds.
   // Hint: String(n).padStart(2, '0')
+  const minutes = Math.floor(durationSeconds / 60); 
+  const seconds = durationSeconds % 60 ;
+
+  return `${minutes}:${String(seconds).padStart(2,"0")}`;
 }
 
 /** Format a Date as "YYYY/MM/DD" (e.g. "2021/03/02"). */
 export function formatDate(date) {
   // TODO: getFullYear(), getMonth() + 1, getDate() - month/day zero-padded
+  const fullYear = date.getFullYear();
+  const month = date.getMonth()+1;
+  const day = date.getDate();
+
+  return `${fullYear}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`
 }
 
 /** A NEW array of scores sorted fastest-first, without mutating the input. */
 export function sortScores(scores) {
   // TODO: copy the array, then sort by durationSeconds ascending.
   // Hint: [...scores] makes a copy so the original is left untouched.
+  const scoreCopy = [...scores].sort((a,b)=>a.durationSeconds-b.durationSeconds);
+  return scoreCopy;
 }
